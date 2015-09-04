@@ -1,0 +1,22 @@
+Added Component: Designator=P1(HDR2X3)
+Added Component: Designator=P2(HDR2X3)
+Added Component: Designator=P3(HDR1X4)
+Added Pin To Net: NetName=VCC Pin=P1-1
+Added Pin To Net: NetName=GND Pin=P1-2
+Added Pin To Net: NetName=VCC Pin=P1-3
+Added Pin To Net: NetName=GND Pin=P1-4
+Added Pin To Net: NetName=VCC Pin=P1-5
+Added Pin To Net: NetName=GND Pin=P1-6
+Added Pin To Net: NetName=VCC Pin=P2-1
+Added Pin To Net: NetName=GND Pin=P2-2
+Added Pin To Net: NetName=VCC Pin=P2-3
+Added Pin To Net: NetName=GND Pin=P2-4
+Added Pin To Net: NetName=VCC Pin=P2-5
+Added Pin To Net: NetName=GND Pin=P2-6
+Added Pin To Net: NetName=OUT1 Pin=P3-1
+Added Pin To Net: NetName=OUT2 Pin=P3-2
+Added Pin To Net: NetName=OUT3 Pin=P3-3
+Added Pin To Net: NetName=OUT4 Pin=P3-4
+Added Member To Class: ClassName=rev1 Member=Component P1 Header 3X2
+Added Member To Class: ClassName=rev1 Member=Component P2 Header 3X2
+Added Member To Class: ClassName=rev1 Member=Component P3 Header 4

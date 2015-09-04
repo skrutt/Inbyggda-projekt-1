@@ -1,0 +1,21 @@
+Change Component Footprint: Designator=C2 Old Footprint=RAD-0.2 New Footprint=RAD-0.3
+Change Component Footprint: Designator=C1 Old Footprint=RB5-10.5 New Footprint=RB7.6-15
+Change Component Designator: OldDesignator=Q2 NewDesignator=Q3
+Change Component Designator: OldDesignator=Q3 NewDesignator=Q9
+Change Component Designator: OldDesignator=Q4 NewDesignator=Q10
+Change Component Designator: OldDesignator=Q5 NewDesignator=Q2
+Change Component Designator: OldDesignator=Q6 NewDesignator=Q4
+Change Component Designator: OldDesignator=Q7 NewDesignator=Q5
+Change Component Designator: OldDesignator=Q8 NewDesignator=Q7
+Change Component Designator: OldDesignator=Q9 NewDesignator=Q11
+Change Component Designator: OldDesignator=Q10 NewDesignator=Q12
+Change Component Designator: OldDesignator=Q11 NewDesignator=Q6
+Change Component Designator: OldDesignator=Q12 NewDesignator=Q8
+Change Net Name : Old Net Name=NetQ2_1 New Net Name=NetQ3_1
+Change Net Name : Old Net Name=NetQ3_2 New Net Name=NetQ9_2
+Change Net Name : Old Net Name=NetQ4_2 New Net Name=NetQ10_2
+Change Net Name : Old Net Name=NetQ7_1 New Net Name=NetQ5_1
+Change Net Name : Old Net Name=NetQ8_1 New Net Name=NetQ7_1
+Change Net Name : Old Net Name=NetQ9_2 New Net Name=NetQ11_2
+Change Net Name : Old Net Name=NetQ10_2 New Net Name=NetQ12_2
+Added Room: Name=rev1

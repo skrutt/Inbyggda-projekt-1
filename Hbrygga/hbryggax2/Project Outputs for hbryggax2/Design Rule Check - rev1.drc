@@ -1,0 +1,50 @@
+Protel Design System Design Rule Check
+PCB File : C:\Umea\github\Inbyggda-projekt-1\Hbrygga\hbryggax2\rev1.PcbDoc
+Date     : 2015-09-04
+Time     : 13:52:48
+
+Processing Rule : Minimum Annular Ring (Minimum=0.3mm) (All)
+   Violation between Minimum Annular Ring (0.1mm < 0.3mm) : Pad Q10-1(84.074mm,75.946mm)  Multi-Layer
+   Violation between Minimum Annular Ring (0.1mm < 0.3mm) : Pad Q10-2(84.074mm,74.676mm)  Multi-Layer
+   Violation between Minimum Annular Ring (0.1mm < 0.3mm) : Pad Q10-3(84.074mm,73.406mm)  Multi-Layer
+   Violation between Minimum Annular Ring (0.1mm < 0.3mm) : Pad Q9-1(84.074mm,45.974mm)  Multi-Layer
+   Violation between Minimum Annular Ring (0.1mm < 0.3mm) : Pad Q9-2(84.074mm,47.244mm)  Multi-Layer
+   Violation between Minimum Annular Ring (0.1mm < 0.3mm) : Pad Q9-3(84.074mm,48.514mm)  Multi-Layer
+   Violation between Minimum Annular Ring (0.1mm < 0.3mm) : Pad Q12-1(63.863mm,75.438mm)  Multi-Layer
+   Violation between Minimum Annular Ring (0.1mm < 0.3mm) : Pad Q12-2(63.863mm,74.168mm)  Multi-Layer
+   Violation between Minimum Annular Ring (0.1mm < 0.3mm) : Pad Q12-3(63.863mm,72.898mm)  Multi-Layer
+   Violation between Minimum Annular Ring (0.1mm < 0.3mm) : Pad Q11-1(62.992mm,46.228mm)  Multi-Layer
+   Violation between Minimum Annular Ring (0.1mm < 0.3mm) : Pad Q11-2(62.992mm,47.498mm)  Multi-Layer
+   Violation between Minimum Annular Ring (0.1mm < 0.3mm) : Pad Q11-3(62.992mm,48.768mm)  Multi-Layer
+Rule Violations :12
+
+Processing Rule : Rule
+Rule Violations :0
+
+Processing Rule : Net Antennae (Tolerance=0mm) (All)
+Rule Violations :0
+
+Processing Rule : Hole To Hole Clearance (Gap=0.254mm) (All),(All)
+Rule Violations :0
+
+Processing Rule : Height Constraint (Min=0mm) (Max=25.4mm) (Prefered=12.7mm) (All)
+Rule Violations :0
+
+Processing Rule : Width Constraint (Min=0.4mm) (Max=3mm) (Preferred=1mm) (All)
+Rule Violations :0
+
+Processing Rule : Power Plane Connect Rule(Relief Connect )(Expansion=0.508mm) (Conductor Width=0.254mm) (Air Gap=0.254mm) (Entries=4) (All)
+Rule Violations :0
+
+Processing Rule : Clearance Constraint (Gap=0.254mm) (All),(All)
+Rule Violations :0
+
+Processing Rule : Un-Routed Net Constraint ( (All) )
+Rule Violations :0
+
+Processing Rule : Short-Circuit Constraint (Allowed=No) (All),(All)
+Rule Violations :0
+
+
+Violations Detected : 12
+Time Elapsed        : 00:00:01

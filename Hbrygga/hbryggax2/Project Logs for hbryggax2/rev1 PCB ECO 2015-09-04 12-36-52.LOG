@@ -1,0 +1,7 @@
+Change Component Designator: OldDesignator=P3 NewDesignator=Pmot
+Added Component: Designator=Pcon(HDR1X4)
+Added Pin To Net: NetName=CONTROL1 Pin=Pcon-1
+Added Pin To Net: NetName=CONTROL2 Pin=Pcon-2
+Added Pin To Net: NetName=CONTROL3 Pin=Pcon-3
+Added Pin To Net: NetName=CONTROL4 Pin=Pcon-4
+Added Member To Class: ClassName=rev1 Member=Component Pcon Header 4
