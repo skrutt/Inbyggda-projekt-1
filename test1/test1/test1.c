@@ -10,16 +10,8 @@
 #include "avr/interrupt.h"
 
 
-typedef struct __attribute__((packed)) {
-		uint8_t adress;
-		uint8_t type;
-		uint8_t payload[1];
-		int crc;
-} super_paketet;
-
-
 //Super global defines
-super_paketet incomming;
+//super_paketet incomming;
 
 //Function read adc
 //Author 
@@ -28,8 +20,12 @@ super_paketet incomming;
 #define	CHECKBIT(ADDRESS,BIT) (ADDRESS & (1<<BIT))
 #define	F_CPU	8E6
 
-#include "Usartlib.h"
+//Own libs
+//#include "Usartlib.h"
+#include "super_paketet.h"
+
 #include "util/delay.h"
+
 
 int main()
 {
@@ -44,7 +40,6 @@ int main()
 	while(1)
 	{
 		ch = ReceiveByteBlocking();
-		send_string("Hello!!\n\r", 9);
 		send_c(ch);
 		if (ch=='a')
 		{
@@ -55,13 +50,13 @@ int main()
 		}else if (ch=='d')
 		{
 			PORTB = 1<<5;
-	}else if (ch=='f')
-	{
-		PORTB = 1<<4;
-}else if (ch==' ')
-{
-	PORTB = 0;
-}
+		}else if (ch=='f')
+		{
+			PORTB = 1<<4;
+		}else if (ch==' ')
+		{
+			PORTB = 0;
+		}
 		_delay_ms(2);
 		}
 }

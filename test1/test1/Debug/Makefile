@@ -37,6 +37,7 @@ SUBDIRS :=
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
+../super_paketet.c \
 ../test1.c \
 ../Usartlib.c
 
@@ -48,18 +49,22 @@ ASM_SRCS +=
 
 
 OBJS +=  \
+super_paketet.o \
 test1.o \
 Usartlib.o
 
 OBJS_AS_ARGS +=  \
+super_paketet.o \
 test1.o \
 Usartlib.o
 
 C_DEPS +=  \
+super_paketet.d \
 test1.d \
 Usartlib.d
 
 C_DEPS_AS_ARGS +=  \
+super_paketet.d \
 test1.d \
 Usartlib.d
 
@@ -77,6 +82,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

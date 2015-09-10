@@ -113,6 +113,12 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="super_paketet.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="super_paketet.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="test1.c">
       <SubType>compile</SubType>
     </Compile>

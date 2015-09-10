@@ -35,7 +35,7 @@ void InitUART( unsigned int baud )
 }
 
 /* Read and write functions */
-unsigned char ReceiveByte( void );
+char ReceiveByte(char * result);
 char ReceiveByteBlocking();
 
 

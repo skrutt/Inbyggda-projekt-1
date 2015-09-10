@@ -69,7 +69,7 @@ ISR(USART_RX_vect)
 }
 
 /* Read and write functions */
-char ReceiveByte( )
+char ReceiveByte(char * result)
 {
 	get_lock();
 	//If we have data
@@ -88,21 +88,24 @@ char ReceiveByte( )
 		incomming_data_counter--;
 
 		//return that data
-		char ret = *temp;
+		*result = *temp;
 		release_lock();
-		return ret;
+		
+		return 1;
 	} 
 	else
 	{
 		//Else fail
 		release_lock();
-		return -1;								// return the data
+		return 0;								// return the data
 	}
 }
 char ReceiveByteBlocking()
 {
 	while (incomming_data_counter == 0);	//Busy wait
-	return ReceiveByte();
+	char temp;
+	ReceiveByte(&temp);
+	return temp;
 }
 
 void send_c(char c)
