@@ -9,6 +9,8 @@
 #ifndef SUPER_PAKETET_H_
 #define SUPER_PAKETET_H_
 
+/* initialize UART */
+void InitUART( unsigned int);
 
 typedef struct __attribute__((packed)) {
 	//uint16_t preamble;

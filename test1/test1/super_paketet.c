@@ -8,7 +8,20 @@
 #include "Usartlib.h"
 
 #define PREAMBLE 0x55FF
-#define package_size sizeof(super_paketet)
+#define PACKAGE_SIZE sizeof(super_paketet)
+
+void InitUART( unsigned int baud )
+{
+	int baudfactor = (F_CPU/16/baud-1);
+	UBRR0H = (unsigned char)(baudfactor>>8);	//set the baud rate
+	UBRR0L = (unsigned char)baudfactor;
+	UCSR0B = _BV(RXEN0) | _BV(TXEN0);			//enable UART receiver and transmitter
+	/* Set frame format: 8data */
+	UCSR0C = (3<<UCSZ00);
+	//Activate interrupts
+	UCSR0B |= (1 << UDRIE0) + (1 << RXCIE0);
+}
+
 
 //make crc checksum
 uint8_t do_crc(uint8_t in_data[], uint8_t length)
@@ -25,17 +38,17 @@ uint8_t do_crc(uint8_t in_data[], uint8_t length)
 //Call from isr
 super_paketet process_data_for_package(char incomming_byte)
 {
-	static char buffer[package_size + 1];
+	static char buffer[PACKAGE_SIZE + 1];
 	//static uint8_t		counter = 0;
 	super_paketet *package = (super_paketet *)buffer;
 	super_paketet *new_package = (super_paketet *)(buffer + 1);
 	
 	//move into last place in buffer
-	buffer[package_size] = incomming_byte;
+	buffer[PACKAGE_SIZE] = incomming_byte;
 	//counter++;
 	
 	//Check buffer
-// 	if (counter >= package_size)
+// 	if (counter >= PACKAGE_SIZE)
 // 	{
 // 		for (int i = 1; i < counter; i++)
 // 		{
@@ -54,7 +67,7 @@ super_paketet process_data_for_package(char incomming_byte)
 	{
 		//Woo paket!
 		//Crc osv
-		if (package->crc == do_crc((uint8_t*)package, package_size - 1))
+		if (package->crc == do_crc((uint8_t*)package, PACKAGE_SIZE - 1))
 		{
 			return *package;
 		}
@@ -89,6 +102,7 @@ super_paketet check_for_package()
 //pad package and send over usart
 void send_package(super_paketet outgoing_package)
 {
+	outgoing_package.crc = do_crc((uint8_t*)&outgoing_package, PACKAGE_SIZE-1);
 	const int outgoing_data_length = sizeof(super_paketet) + 2;
 	
 	char outgoing_data[outgoing_data_length]; // package + preamble

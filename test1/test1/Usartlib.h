@@ -20,20 +20,6 @@
 #define F_CPU 8000000UL
 #endif
 
-/* initialize UART */
-//This is placed here to make use of external define
-void InitUART( unsigned int baud )
-{
-	int baudfactor = (F_CPU/16/baud-1);
-	UBRRH = (unsigned char)(baudfactor>>8);	//set the baud rate
-	UBRRL = (unsigned char)baudfactor;
-	UCSRB = _BV(RXEN) | _BV(TXEN);			//enable UART receiver and transmitter
-	/* Set frame format: 8data */
-	UCSRC = (3<<UCSZ0);
-	//Activate interrupts
-	UCSRB |= (1 << UDRIE) + (1 << RXCIE);
-}
-
 /* Read and write functions */
 char ReceiveByte(char * result);
 char ReceiveByteBlocking();

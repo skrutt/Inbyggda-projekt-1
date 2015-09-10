@@ -33,7 +33,7 @@ ISR(USART_UDRE_vect)
 	if ( 0 != outgoing_data_counter)
 	{
 		outgoing_data_counter--;
-		UDR = *outgoing_data_head; 		// start transmition
+		UDR0 = *outgoing_data_head; 		// start transmition
 		outgoing_data_head++;
 		if (outgoing_data_head >= (outgoing_data + USART_TX_BUFFER_SIZE))
 		{
@@ -41,7 +41,7 @@ ISR(USART_UDRE_vect)
 		}
 	}else{
 		//Inactivate interrupt
-		UCSRB &= ~(1 << UDRIE);
+		UCSR0B &= ~(1 << UDRIE0);
 		
 	}
 }
@@ -49,7 +49,7 @@ ISR(USART_UDRE_vect)
 ISR(USART_RX_vect)
 {
 	//place char into buffer
-	*incomming_data_head = UDR;	//Read from UDR gets RX byte
+	*incomming_data_head = UDR0;	//Read from UDR gets RX byte
 	
 	//increase head
 	incomming_data_head++;
@@ -122,7 +122,7 @@ void send_c(char c)
 	*temp = c;		//add to queue
 	outgoing_data_counter++;
 	//Activate TX interrupt
-	UCSRB |= (1 << UDRIE);
+	UCSR0B |= (1 << UDRIE0);
 	release_lock();
 }
 
