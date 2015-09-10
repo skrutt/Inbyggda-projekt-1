@@ -12,12 +12,12 @@
 //#include "Usartlib.h"
 
 //Stuff for usart system
-#define USART_TX_BUFFER_SIZE 10
+#define USART_TX_BUFFER_SIZE 100
 volatile char		outgoing_data[USART_TX_BUFFER_SIZE];
 volatile uint8_t	outgoing_data_counter = 0;
 volatile char*		outgoing_data_head = outgoing_data;
 
-#define USART_RX_BUFFER_SIZE 10
+#define USART_RX_BUFFER_SIZE 100
 volatile char		incomming_data[USART_TX_BUFFER_SIZE];
 volatile uint8_t	incomming_data_counter = 0;
 volatile char*		incomming_data_head = incomming_data;
