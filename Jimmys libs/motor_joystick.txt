@@ -1,0 +1,18 @@
+
+		
+		if(thLeft < 127) {
+			motor_set_direction(&leftMotor, 0);
+			motor_set_throttle(&leftMotor, 127 - thLeft);
+		}	
+		else {
+			motor_set_direction(&leftMotor, 1);
+			motor_set_throttle(&leftMotor, thLeft - 127);
+		}	
+		if(thRight < 127) {
+			motor_set_direction(&rightMotor, 0);
+			motor_set_throttle(&rightMotor, 127 - thRight);
+		}
+		else {
+			motor_set_direction(&rightMotor, 1);
+			motor_set_throttle(&rightMotor, thRight - 127);
+		}
