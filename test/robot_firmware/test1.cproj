@@ -113,6 +113,9 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="motor.c">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="super_paketet.c">
       <SubType>compile</SubType>
     </Compile>

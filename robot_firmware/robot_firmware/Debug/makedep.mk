@@ -2,9 +2,11 @@
 # Automatically-generated file. Do not edit or delete the file
 ################################################################################
 
-super_paketet.c
+motor.c
 
-test1.c
+robot_firmware.c
+
+super_paketet.c
 
 Usartlib.c
 
