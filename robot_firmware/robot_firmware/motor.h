@@ -14,7 +14,7 @@ typedef struct Motor {
 void motor_init(Motor*, uint8_t, volatile uint8_t*, volatile uint8_t*, volatile uint8_t*, uint8_t);
 void motor_pwm_init();
 
-void motor_set_throttle(Motor*, uint8_t);
+void motor_set_throttle(Motor *motor, uint8_t th, float scale);
 void motor_set_direction(Motor*, uint8_t);
 
 #endif

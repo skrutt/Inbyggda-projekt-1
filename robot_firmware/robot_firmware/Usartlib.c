@@ -111,18 +111,22 @@ char ReceiveByteBlocking()
 void send_c(char c)
 {
 	get_lock();
-	volatile char * temp = (outgoing_data_head + outgoing_data_counter);
-	
-	//Check for overflow
-	if (temp >= (outgoing_data + USART_TX_BUFFER_SIZE))
+	//Check if there is space in the buffer
+	if (outgoing_data_counter < USART_TX_BUFFER_SIZE)
 	{
-		temp -= USART_TX_BUFFER_SIZE;
-	}
+		volatile char * temp = (outgoing_data_head + outgoing_data_counter);
+	
+		//Check for overflow
+		if (temp >= (outgoing_data + USART_TX_BUFFER_SIZE))
+		{
+			temp -= USART_TX_BUFFER_SIZE;
+		}
 
-	*temp = c;		//add to queue
-	outgoing_data_counter++;
-	//Activate TX interrupt
-	UCSR0B |= (1 << UDRIE0);
+		*temp = c;		//add to queue
+		outgoing_data_counter++;
+		//Activate TX interrupt
+		UCSR0B |= (1 << UDRIE0);
+	}
 	release_lock();
 }
 
@@ -145,3 +149,19 @@ int8_t send_string(char data[], uint8_t length)
 	
 	return 0;
 } 
+int8_t send_string_blocking(char data[], uint8_t length)
+{
+
+	int8_t ret = 0;
+		
+	//Wait for empty buffer
+	while(outgoing_data_counter){}
+	
+	//send data
+	ret = send_string(data, length);
+	
+	//Wait until empty again
+	while(outgoing_data_counter){}
+	
+	return ret;
+}

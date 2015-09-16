@@ -21,13 +21,25 @@ void motor_pwm_init() {
 	OCR0B = 0;
 }
 
-void motor_set_throttle(Motor *motor, uint8_t th) {
-	uint8_t finalThrottle = th + motor->throttle_offset;
+void motor_set_throttle(Motor *motor, uint8_t th, float scale) 
+{
+	const float max_in = 127;
+	float max_ut = 255 - motor->throttle_offset;
+	float	perc = th / max_in;
+	uint8_t finalThrottle = (perc * max_ut * scale + 0.5) + motor->throttle_offset;
+	
+	
+	
 	
 	if(th + motor->throttle_offset > 255) {
 		finalThrottle = 255;
 	}
 	else if(th + motor->throttle_offset < 0) {
+		finalThrottle = 0;
+	}
+	//Set to stop!
+	if (th == 0)
+	{
 		finalThrottle = 0;
 	}
 	
