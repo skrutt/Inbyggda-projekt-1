@@ -1,7 +1,7 @@
 /*
- * test1.c
+ * robot_firmware.c
  *
- * Created: 2015-08-31 13:24:59
+ *  Created: 2015-08-31 13:24:59
  *  Author: peol0071
  */ 
 
@@ -24,6 +24,7 @@
 //Own libs
 #include "Usartlib.h"
 #include "super_paketet.h"
+#include "motor.h"
 
 #include "util/delay.h"
 
@@ -40,6 +41,14 @@ int uart_putchar(char c, FILE *stream)
 
 int main()
 {
+	//Set up motor pwm
+	Motor leftMotor;
+	Motor rightMotor;
+	motor_init(&leftMotor, 0, &OCR0A, &DDRD, &PORTD, 3);
+	motor_init(&rightMotor, 0, &OCR0B, &DDRD, &PORTD, 4);
+
+	motor_pwm_init();
+	
 	DDRD = 2;				// output
 	DDRB = 0xff;					// input
 	SETBIT(PORTB,PB0);			// enable pull-up
@@ -50,7 +59,9 @@ int main()
 	fdev_setup_stream(&mystdout, uart_putchar, NULL, _FDEV_SETUP_WRITE);
 	stdout = &mystdout;			
 	char	ch = 0;
-	send_string("Wait", 4);
+	send_string(" Wait", 4);
+	
+	int thLeft = 127,  thRight = 127;
 
 	while(1)
 	{
@@ -60,8 +71,28 @@ int main()
 		super_paketet inc = check_for_package();
 		if (inc.adress != 0 && inc.type == 1)
 		{
+			thLeft = inc.payload[0];
+			thRight = inc.payload[1];
 			printf("Paket! payload: %d", inc.payload[0]);
 		}
+		
+		if(thLeft < 127) {
+			motor_set_direction(&leftMotor, 0);
+			motor_set_throttle(&leftMotor, 127 - thLeft);
+		}
+		else {
+			motor_set_direction(&leftMotor, 1);
+			motor_set_throttle(&leftMotor, thLeft - 127);
+		}
+		if(thRight < 127) {
+			motor_set_direction(&rightMotor, 0);
+			motor_set_throttle(&rightMotor, 127 - thRight);
+		}
+		else {
+			motor_set_direction(&rightMotor, 1);
+			motor_set_throttle(&rightMotor, thRight - 127);
+		}
+		
 		if (ch=='a')
 		{
 			PORTB = 1<<7;
@@ -78,6 +109,7 @@ int main()
 		{
 			PORTB = 0;
 		}
+		
 		_delay_ms(2);
-		}
+	}
 }
