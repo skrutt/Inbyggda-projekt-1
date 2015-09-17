@@ -149,19 +149,26 @@ int8_t send_string(char data[], uint8_t length)
 	
 	return 0;
 } 
+
+void flush_usart()
+{
+	//Wait for empty buffer
+	while(outgoing_data_counter){}
+}
+
 int8_t send_string_blocking(char data[], uint8_t length)
 {
 
 	int8_t ret = 0;
 		
 	//Wait for empty buffer
-	while(outgoing_data_counter){}
+	flush_usart();
 	
 	//send data
 	ret = send_string(data, length);
 	
 	//Wait until empty again
-	while(outgoing_data_counter){}
+	flush_usart();
 	
 	return ret;
 }

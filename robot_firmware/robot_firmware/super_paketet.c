@@ -6,9 +6,38 @@
  */ 
 #include "super_paketet.h"
 #include "Usartlib.h"
+#include <util/delay.h>
 
 #define PREAMBLE 0x55FF
 #define PACKAGE_SIZE sizeof(super_paketet)
+
+//function pointers for setting link mode
+void (*enable_transmit_func)();
+void (*disable_transmit_func)();
+
+//Init function for controlling radio module
+void set_link_mode_functions(void (*enable_transmit), void (*disable_transmit))
+{
+	enable_transmit_func = enable_transmit;
+	disable_transmit_func = disable_transmit;
+}
+//Wrapper
+inline void set_link_mode_transmit()
+{
+	if (enable_transmit_func)
+	{
+		enable_transmit_func();
+	}
+}
+//Wrapper
+inline void set_link_mode_receive()
+{
+	if (disable_transmit_func)
+	{
+		disable_transmit_func();
+	}
+}
+
 
 void InitUART( unsigned int baud )
 {
@@ -47,17 +76,6 @@ super_paketet process_data_for_package(char incomming_byte)
 	buffer[PACKAGE_SIZE] = incomming_byte;
 	//counter++;
 	
-	//Check buffer
-// 	if (counter >= PACKAGE_SIZE)
-// 	{
-// 		for (int i = 1; i < counter; i++)
-// 		{
-// 			//move along, and drop oldest byte
-// 			buffer[i - 1] = buffer[i];
-// 			//*buffer = *++buffer;
-// 		}
-// 	}
-// 	
 	//Copy new content
 	*package = *new_package;
 	//check for package
@@ -111,4 +129,47 @@ void send_package(super_paketet outgoing_package)
 	*(super_paketet*)(outgoing_data + 2) = outgoing_package;
 	
 	send_string(outgoing_data, outgoing_data_length);
+}
+
+//Send package that requires an answer
+//Append request bit to type and wait for answer
+//return 0 if we got answer
+int8_t send_request_package(super_paketet *outgoing_package, int timeout)
+{
+	super_paketet internal_package = *outgoing_package;
+	//Pad with request bit
+	internal_package.type |= REQUEST_TYPE;	
+
+	//Send to buffer
+	send_package(internal_package);
+	
+	//Wait for buffer to be empty
+	flush_usart();
+	
+	//Toggle transmit pin to listen
+	set_link_mode_receive();
+	
+	//Wait for package for some time
+	for (int i = 0; i < timeout; i++)
+	{
+		//Check if we have got a package
+		internal_package = check_for_package();
+		//is it what we want?
+		if (internal_package.adress != 0 && internal_package.type == outgoing_package->type)
+		{
+			//Woo package!
+			*outgoing_package = internal_package;
+			//Return success
+			return 0;
+			
+		}
+		_delay_ms(1);
+	}
+	
+	//Toggle pin back
+	set_link_mode_transmit();
+	
+	//Return fail
+	return -1;
+
 }

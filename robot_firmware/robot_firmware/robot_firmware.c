@@ -37,6 +37,22 @@ int uart_putchar(char c, FILE *stream)
 	return 0;
 }
 
+#define TRANSMIT_PIN		1 << 4
+#define TRANSMIT_PORT		PORTC
+#define TRANSMIT_PORT_DDR	DDRC
+
+//Set transmit high
+void enable_transmit()
+{
+	TRANSMIT_PORT_DDR |= TRANSMIT_PIN;
+	TRANSMIT_PORT	|= TRANSMIT_PIN;
+}
+//Set transmit low
+void disable_transmit()
+{
+	TRANSMIT_PORT_DDR |= TRANSMIT_PIN;
+	TRANSMIT_PORT	&= ~TRANSMIT_PIN;
+}
 
 
 int main()
@@ -55,6 +71,12 @@ int main()
 	motor_init(&rightMotor, 10, &OCR0B, &DDRB, &PORTB, 7);
 
 	motor_pwm_init(); 
+	
+	//Set up superpaketet
+	set_link_mode_functions(enable_transmit, disable_transmit);
+	
+	//We are listening here
+	disable_transmit();
 	
 
 	sei();
@@ -77,6 +99,18 @@ int main()
 		super_paketet inc = check_for_package();
 		if (inc.adress != 0)
 		{
+			//Check if package want a response
+			if (is_request_type(inc.type))
+			{
+				//Send response
+				enable_transmit();
+				//Fill data
+				//put distance from irsensor into inc.payload here
+				send_package(inc);
+				//wait for send
+				flush_usart();
+				disable_transmit();
+			}
 			switch(inc.type)
 			{
 				case 1:
