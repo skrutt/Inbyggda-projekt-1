@@ -16,6 +16,27 @@
 #include "super_paketet.h"
 #include "SevenSeg.h"
 
+/* --------- Transmit mode --------- */
+#define TRANSMIT_PIN		1 << 4
+#define TRANSMIT_PORT		PORTC
+#define TRANSMIT_PORT_DDR	DDRC
+
+//Set transmit high
+void enable_transmit()
+{
+	TRANSMIT_PORT_DDR |= TRANSMIT_PIN;
+	TRANSMIT_PORT	|= TRANSMIT_PIN;
+}
+//Set transmit low
+void disable_transmit()
+{
+	TRANSMIT_PORT_DDR |= TRANSMIT_PIN;
+	TRANSMIT_PORT	&= ~TRANSMIT_PIN;
+}
+
+/* ------------------------------- */
+
+
 void usart_putchar(char data)
 {
 	// Stay here until data buffer is empty
@@ -44,10 +65,14 @@ int main(void)
 	sei();
 	initSevenSeg();
 
-	obstacleDistance = 49;		//Distance to obstacle as measured by IR sensor
+	obstacleDistance = 0;		//Distance to obstacle as measured by IR sensor
 		
 	super_paketet package;
 	package.adress = ADRESS;
+	
+	//Set up superpaketet
+	set_link_mode_functions(enable_transmit, disable_transmit);	
+	enable_transmit();
 	
 	
 	uint16_t thScaling = 10000;
@@ -58,19 +83,37 @@ int main(void)
 	package.payload[1] = (thScaling >> 8);
 	send_package(package);
 	_delay_ms(25);
-
 	
-    while(1)
+	
+	// Counter for timing distance requests
+	volatile uint8_t distReqCnt = 0;
+
+	while(1)
     {		
 		//printf("%d, ", joystick_get_throttle(&js, JOYSTICK_LEFT_CHANNEL));
 		//printf("%d \n", joystick_get_throttle(&js, JOYSTICK_RIGHT_CHANNEL));
-		
+	
+    
+    	
 		package.type = 0x01;
         package.payload[0] = joystick_get_throttle(&js, JOYSTICK_LEFT_CHANNEL);
 		package.payload[1] = joystick_get_throttle(&js, JOYSTICK_RIGHT_CHANNEL);
         //uint8_t thRight = joystick_get_throttle_dir_combined(&js, 'r');
-		send_package(package);
-		_delay_ms(1);
+		send_package(package);	
+		
+		distReqCnt++;
+		
+		if(distReqCnt >= 50) {
+			_delay_ms(5);
+			package.type = 0x07;	//Demand distance data
+			if(send_request_package(&package, 30) != -1) {
+				obstacleDistance = package.payload[0];
+			}
+			distReqCnt = 0;
+		}
+		
+		
+		_delay_ms(3);
 		
 
     }

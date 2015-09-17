@@ -7,11 +7,9 @@
 
 #define	SETBIT(ADDRESS,BIT) (ADDRESS |= (1<<BIT))
 #define	CLEARBIT(ADDRESS,BIT) (ADDRESS &= ~(1<<BIT))
-#include <util/delay.h> // Optimization -O1
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include "SevenSeg.h"
-//uint8_t whichSeg = 0;
 
 //Timer 2 Overflow
 ISR(TIMER2_OVF_vect)
@@ -20,10 +18,6 @@ ISR(TIMER2_OVF_vect)
 	uint8_t sevenTen;
 	uint8_t sevenOne;
 	static uint8_t whichSeg = 0;
-	//static uint8_t obstacleDistance = 0;
-
-	//sevenTen; //Tiondelar
-	//sevenOne; //Endelar
 
 	if(obstacleDistance < 10)
 	{
@@ -57,21 +51,13 @@ ISR(TIMER2_OVF_vect)
 }
 
 void initSevenSeg() {
-	DDRB = 0xFF; //7 seg port
+	DDRB = 0xFF;		//7 seg port
 	DDRC |= 0b00001100; //7 seg enable pins
-	initTimer2(); //Enable 7 seg timer
+	initTimer2();		//Enable 7 seg timer
 }
 
 void initTimer2()
 {	
-	TCCR2B = 1 << CS22 | 1 << CS21 | CS20 << 0; //Prescale 256
-	
-	TIMSK2 = (1<<TOIE2); //Enable Timer 2 overflow flag	
+	TCCR2B = 1 << CS22 | 1 << CS21 | CS20 << 0;		//Prescaler 256	
+	TIMSK2 = (1<<TOIE2);							//Enable Timer 2 overflow flag	
 }
-
-/*
-uint8_t setobstacleDistance(uint8_t obstacleDistance)
-{
-	return obstacleDistance;
-}
-*/

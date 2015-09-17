@@ -11,7 +11,7 @@
 
 #ifndef F_CPU
 /* prevent compiler error by supplying a default */
-# warning "F_CPU not defined for <SevenSeg.c>"
+# warning "F_CPU not defined for <SevenSeg.h>"
 #define F_CPU 8000000UL
 #endif
 
