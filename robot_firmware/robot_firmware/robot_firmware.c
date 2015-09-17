@@ -57,34 +57,31 @@ void disable_transmit()
 
 uint8_t irSensor(uint16_t adc)
 {
+	//translate into voltage
 	double volt = 0.0035*adc;
-	
+	//converts to cm
 	uint8_t cm = 26.922*pow(volt, -1.245);
 	
 	return cm;
 }
 
 uint16_t adc_read(uint8_t adcx) {
-	/* adcx is the analog pin we want to use.  ADMUX's first few bits are
-	 * the binary representations of the numbers of the pins so we can
-	 * just 'OR' the pin's number with ADMUX to select that pin.
-	 * We first zero the four bits by setting ADMUX equal to its higher
-	 * four bits. */
+
+	//sets ADMUX to the pin that will be read
 	ADMUX	&=	0xf0;
 	ADMUX	|=	adcx;
 
-	/* This starts the conversion. */
+	//start conversion
 	ADCSRA |= _BV(ADSC);
 
-	/* This is an idle loop that just wait around until the conversion
-	 * is finished.  It constantly checks ADCSRA's ADSC bit, which we just
-	 * set above, to see if it is still set.  This bit is automatically
-	 * reset (zeroed) when the conversion is ready so if we do this in
-	 * a loop the loop will just go until the conversion is ready. */
-	while ( (ADCSRA & _BV(ADSC)) );
 
-	/* Finally, we return the converted value to the calling function. */
+	//Waiting loop for conversion
+	while ( (ADCSRA & _BV(ADSC)) );
 	return ADC;
+}
+void funkar(void)
+{
+	return;
 }
 int main()
 {
@@ -131,16 +128,27 @@ int main()
 		if (inc.adress != 0)
 		{
 			//Check if package want a response
-			if (is_request_type(inc.type))
+			if ((inc.type & 0x0f) == 7)
 			{
 				//Send response
 				enable_transmit();
+				inc.type = 7;
 				//Fill data
-				//put distance from irsensor into inc.payload here
-				inc.payload[0] = irSensor(adc_read(ADC_PIN));
+				//put distance from irSensor into inc.payload here
+				static uint8_t count = 0;
+				inc.payload[0] = count++;//irSensor(adc_read(ADC_PIN));
+				if (count == 99)
+				{
+					count = 0;
+				}
+				//_delay_ms();
 				send_package(inc);
 				//wait for send
 				flush_usart();
+				_delay_ms(1);
+				
+
+				//_delay_ms(10);
 				disable_transmit();
 			}
 			switch(inc.type)
@@ -155,7 +163,7 @@ int main()
 					printf("Paket! %d & %d\n\r", inc.payload[0], inc.payload[1]);
 					break;
 				default:
-					send_string(".", 1);
+					//send_string(".", 1);
 					break;
 			}
 		}
@@ -181,4 +189,5 @@ int main()
 		}
 		
 	}
+	funkar();
 }

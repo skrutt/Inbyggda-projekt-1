@@ -152,8 +152,15 @@ int8_t send_string(char data[], uint8_t length)
 
 void flush_usart()
 {
+	volatile static int dummy = 0;
 	//Wait for empty buffer
-	while(outgoing_data_counter){}
+	while(//Activate TX interrupt
+	UCSR0B & (1 << UDRIE0) )
+	{
+		dummy++;
+		
+	}
+	//_delay_ms(1);
 }
 
 int8_t send_string_blocking(char data[], uint8_t length)
