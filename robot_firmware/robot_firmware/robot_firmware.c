@@ -20,6 +20,7 @@
 #define	CLEARBIT(ADDRESS,BIT) (ADDRESS &= ~(1<<BIT))
 #define	CHECKBIT(ADDRESS,BIT) (ADDRESS & (1<<BIT))
 #define	F_CPU	8E6
+#define ADC_PIN	5
 
 //Own libs
 #include "Usartlib.h"
@@ -54,14 +55,44 @@ void disable_transmit()
 	TRANSMIT_PORT	&= ~TRANSMIT_PIN;
 }
 
+uint8_t irSensor(uint16_t adc)
+{
+	double volt = 0.0035*adc;
+	
+	uint8_t cm = 26.922*pow(volt, -1.245);
+	
+	return cm;
+}
 
+uint16_t adc_read(uint8_t adcx) {
+	/* adcx is the analog pin we want to use.  ADMUX's first few bits are
+	 * the binary representations of the numbers of the pins so we can
+	 * just 'OR' the pin's number with ADMUX to select that pin.
+	 * We first zero the four bits by setting ADMUX equal to its higher
+	 * four bits. */
+	ADMUX	&=	0xf0;
+	ADMUX	|=	adcx;
+
+	/* This starts the conversion. */
+	ADCSRA |= _BV(ADSC);
+
+	/* This is an idle loop that just wait around until the conversion
+	 * is finished.  It constantly checks ADCSRA's ADSC bit, which we just
+	 * set above, to see if it is still set.  This bit is automatically
+	 * reset (zeroed) when the conversion is ready so if we do this in
+	 * a loop the loop will just go until the conversion is ready. */
+	while ( (ADCSRA & _BV(ADSC)) );
+
+	/* Finally, we return the converted value to the calling function. */
+	return ADC;
+}
 int main()
 {
-	DDRD = 2;				// output
-	DDRB = 0xff;					// input
+	DDRD = 2;					// output
+	DDRB = 0xff;				// input
 	SETBIT(PORTB,PB0);			// enable pull-up
 	SETBIT(PORTB,PB1);			// enable pull-up
-	
+	ADCSRA |= _BV(ADEN);		//Enable adc	
 	//Set up motor pwm
 	Motor leftMotor;
 	Motor rightMotor;
@@ -106,6 +137,7 @@ int main()
 				enable_transmit();
 				//Fill data
 				//put distance from irsensor into inc.payload here
+				inc.payload[0] = irSensor(adc_read(ADC_PIN));
 				send_package(inc);
 				//wait for send
 				flush_usart();
