@@ -39,6 +39,7 @@ SUBDIRS :=
 C_SRCS +=  \
 ../joystick.c \
 ../proj1_remote.c \
+../SevenSeg.c \
 ../super_paketet.c \
 ../Usartlib.c
 
@@ -52,24 +53,28 @@ ASM_SRCS +=
 OBJS +=  \
 joystick.o \
 proj1_remote.o \
+SevenSeg.o \
 super_paketet.o \
 Usartlib.o
 
 OBJS_AS_ARGS +=  \
 joystick.o \
 proj1_remote.o \
+SevenSeg.o \
 super_paketet.o \
 Usartlib.o
 
 C_DEPS +=  \
 joystick.d \
 proj1_remote.d \
+SevenSeg.d \
 super_paketet.d \
 Usartlib.d
 
 C_DEPS_AS_ARGS +=  \
 joystick.d \
 proj1_remote.d \
+SevenSeg.d \
 super_paketet.d \
 Usartlib.d
 
@@ -87,6 +92,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

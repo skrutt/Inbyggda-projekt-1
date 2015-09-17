@@ -6,6 +6,8 @@ joystick.c
 
 proj1_remote.c
 
+SevenSeg.c
+
 super_paketet.c
 
 Usartlib.c
