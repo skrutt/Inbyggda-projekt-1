@@ -58,7 +58,7 @@ int main(void)
 {
 	stdout = &mystdout;
 	Joystick js;
-	joystick_init(&js, 2, 4, 126, 131);
+	joystick_init(&js, 6, 6, 145, 150);
 	
 	InitUART(9600);
 	
@@ -87,6 +87,8 @@ int main(void)
 	
 	// Counter for timing distance requests
 	volatile uint8_t distReqCnt = 0;
+	uint16_t th_scale = 5000;
+	DDRC &= ~(1 << 5);
 
 	while(1)
     {		
@@ -103,13 +105,31 @@ int main(void)
 		
 		distReqCnt++;
 		
-		if(distReqCnt >= 50) {
-			_delay_ms(5);
-			package.type = 0x07;	//Demand distance data
-			if(send_request_package(&package, 30) != -1) {
-				obstacleDistance = package.payload[0];
-			}
-			distReqCnt = 0;
+		switch(distReqCnt)
+		{
+			 case 10:
+				_delay_ms(3);
+				package.type = 0x07;	//Demand distance data
+				if(send_request_package(&package, 20) != -1) {
+					obstacleDistance = package.payload[0];
+				}
+				break;
+			case 20:
+				PORTC |= 1 << 5;
+				if ((PINC & (1 << 5)) == 0)
+				{
+					th_scale = 10000;
+				}else{
+					th_scale = 5000;
+				}
+				
+				package.type = 0x02;
+				*(uint16_t*)package.payload = th_scale;
+				//uint8_t thRight = joystick_get_throttle_dir_combined(&js, 'r');
+				send_package(package);
+				//Last one, reset
+				distReqCnt = 0;
+				break;
 		}
 		
 		

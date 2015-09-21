@@ -27,7 +27,7 @@ char ReceiveByteBlocking();
 
 void send_c(char c);
 
-inline void flush_usart();
+void flush_usart();
 int8_t send_string_blocking(char data[], uint8_t length);
 int8_t send_string(char data[], uint8_t length);
 

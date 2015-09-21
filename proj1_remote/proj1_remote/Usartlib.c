@@ -71,7 +71,7 @@ ISR(USART_RX_vect)
 /* Read and write functions */
 char ReceiveByte(char * result)
 {
-	get_lock();
+	//get_lock();
 	//If we have data
 	if (incomming_data_counter > 0)
 	{
@@ -89,14 +89,14 @@ char ReceiveByte(char * result)
 
 		//return that data
 		*result = *temp;
-		release_lock();
+//		release_lock();
 		
 		return 1;
 	} 
 	else
 	{
 		//Else fail
-		release_lock();
+	//	release_lock();
 		return 0;								// return the data
 	}
 }
@@ -152,8 +152,15 @@ int8_t send_string(char data[], uint8_t length)
 
 void flush_usart()
 {
+	volatile static int dummy = 0;
 	//Wait for empty buffer
-	while(outgoing_data_counter){}
+	while(//Activate TX interrupt
+	UCSR0B & (1 << UDRIE0) )
+	{
+		dummy++;
+		
+	}
+	//_delay_ms(1);
 }
 
 int8_t send_string_blocking(char data[], uint8_t length)

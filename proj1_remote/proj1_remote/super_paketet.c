@@ -155,16 +155,19 @@ int8_t send_request_package(super_paketet *outgoing_package, int timeout)
 	{
 		//Check if we have got a package
 		internal_package = check_for_package();
+
 		//is it what we want?
 		if (internal_package.adress != 0 && internal_package.type == outgoing_package->type)
 		{
 			//Woo package!
 			*outgoing_package = internal_package;
+			//Toggle pin back
+			set_link_mode_transmit();
 			//Return success
 			return 0;
 			
 		}
-		_delay_ms(1);
+		_delay_ms(1);		
 	}
 	
 	//Toggle pin back

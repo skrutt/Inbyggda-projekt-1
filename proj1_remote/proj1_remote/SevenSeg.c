@@ -58,6 +58,6 @@ void initSevenSeg() {
 
 void initTimer2()
 {	
-	TCCR2B = 1 << CS22 | 1 << CS21 | CS20 << 0;		//Prescaler 256	
+	TCCR2B = 1 << CS22 | 0 << CS21 | CS20 << 0;		//Prescaler 256	
 	TIMSK2 = (1<<TOIE2);							//Enable Timer 2 overflow flag	
 }
