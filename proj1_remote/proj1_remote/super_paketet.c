@@ -64,6 +64,52 @@ uint8_t do_crc(uint8_t in_data[], uint8_t length)
 	return ret;
 }
 
+uint8_t scramblePackage(super_paketet *package) {
+	uint8_t *b;
+	b = (uint8_t *)&package;
+	
+	uint8_t i;
+	for(i = 0; i < 5; i++) {
+		if(i == 1) i++; //Skip type byte
+		
+		if(countTransitions(*(b+i)) < 4) {
+			*(b+i) = 0b10101010 ^ *(b+i);
+			package->type |= (1 << 7);
+		}
+	}
+}
+
+uint8_t descramblePackage(super_paketet *package) {
+	uint8_t *b;
+	b = (uint8_t *)&package;	
+	
+	for(i = 0; i < 5; i++) {
+		if(i == 1) i++; //Skip type byte
+		
+		*(b+i) = 0b10101010 ^ *(b+i);
+	}
+	
+	package->type &= ~(1 << 7);
+}
+
+uint8_t countTransitions (uint8_t b) {
+	uint8_t mask, count;
+	uint8_t bCopy, xorResult;
+	
+	bCopy = b;
+	bCopy <<= 1;
+	
+	xorResult = b ^ bCopy;
+
+	for (count = 0, mask = 0x80; mask != 0; mask >>= 1)
+	{
+		if (xorResult & mask)
+		count++;
+	}
+	
+	return (count);
+}
+
 //Call from isr
 super_paketet process_data_for_package(char incomming_byte)
 {
@@ -80,6 +126,10 @@ super_paketet process_data_for_package(char incomming_byte)
 	*package = *new_package;
 	//check for package
 	
+	// Check if the package is scrambled.
+	if(package->type & (1 << 7)) {
+		descramblePackage(&package);
+	}
 	
 	if (package->adress == ADRESS)
 	{
@@ -121,6 +171,10 @@ super_paketet check_for_package()
 void send_package(super_paketet outgoing_package)
 {
 	outgoing_package.crc = do_crc((uint8_t*)&outgoing_package, PACKAGE_SIZE-1);
+	
+	//Bit scrambling
+	scramblePackage(&outgoing_package);
+	
 	const int outgoing_data_length = sizeof(super_paketet) + 2;
 	
 	char outgoing_data[outgoing_data_length]; // package + preamble

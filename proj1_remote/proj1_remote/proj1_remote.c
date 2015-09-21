@@ -10,6 +10,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <stdio.h>
+#include <avr/sleep.h>
 
 #include "joystick.h"
 #include "Usartlib.h"
@@ -51,6 +52,31 @@ int usart_putchar_printf(char var, FILE *stream) {
 	return 0;
 }
 
+ISR(TIMER1_OVF_vect) {
+	
+}
+
+void initSleepTimer() {
+	TCCR1B = 1 << CS12;		// Prescaler 256
+	TIMSK1 = (1 << TOIE1);	// Enable OF-interrupt
+}
+
+void initWakeupISR() {
+	DDRD &= ~(1 << 2); 
+	PORTD |= (1 << 2); 
+	EIMSK |= (1 << INT0);     // Turns on INT0
+}
+
+void putToSleep() {
+	PORTC &= ~(1 << 2);
+	PORTC &= ~(1 << 3);	//Turn off 7seg
+	
+	set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+	sleep_mode();
+}
+
+
+
 static FILE mystdout = FDEV_SETUP_STREAM(usart_putchar_printf, NULL, _FDEV_SETUP_WRITE);
 
 
@@ -61,6 +87,7 @@ int main(void)
 	joystick_init(&js, 6, 6, 145, 150);
 	
 	InitUART(9600);
+	initWakeupISR();
 	
 	sei();
 	initSevenSeg();

@@ -6,14 +6,6 @@ void joystick_init(Joystick *js, uint8_t deadzone_left, uint8_t deadzone_right, 
 	js->middle_left = middle_left;
 	js->middle_right = middle_right;
 
-	//------ Config Timer Interrupt	------
-	/*
-	TCCR1B |= (1 << WGM12); 					// Enable CTC mode.
-	TIMSK1 |= (1 << OCIE1A);					// Enable timer CTC interrupt.
-	
-	OCR1A = 60000; 								// Set compare value.
-	TCCR1B |= ((1 << CS10) | (1 << CS11)); 		// Start timer with 64 prescaler.
-	*/
 	//----------- Config ADC -------------
 	ADCSRA |= (1 << ADPS2) | (1 << ADPS1);  	// ADC prescaler to 128 (gives 125kHz with 8MHz cpu).
 	ADMUX |= (1 << REFS0); 						// Use AVCC as reference.
