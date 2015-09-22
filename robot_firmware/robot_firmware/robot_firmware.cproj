@@ -43,12 +43,12 @@
     <com_atmel_avrdbg_tool_ispmk2>
       <ToolOptions>
         <InterfaceProperties>
-          <IspClock>938750</IspClock>
+          <IspClock>125000</IspClock>
         </InterfaceProperties>
         <InterfaceName>ISP</InterfaceName>
       </ToolOptions>
       <ToolType>com.atmel.avrdbg.tool.ispmk2</ToolType>
-      <ToolNumber>000200135348</ToolNumber>
+      <ToolNumber>000200144219</ToolNumber>
       <ToolName>AVRISP mkII</ToolName>
     </com_atmel_avrdbg_tool_ispmk2>
   </PropertyGroup>
@@ -113,6 +113,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="robot_firmware.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="sleepMode.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="sleepMode.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="super_paketet.c">

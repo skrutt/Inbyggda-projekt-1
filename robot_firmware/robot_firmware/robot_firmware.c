@@ -8,14 +8,12 @@
 
 #include <avr/io.h>
 #include <stdio.h>
+#include <avr/power.h>
 #include "avr/interrupt.h"
 
 
 //Super global defines
-//super_paketet incomming;
 
-//Function read adc
-//Author 
 #define	SETBIT(ADDRESS,BIT) (ADDRESS |= (1<<BIT))
 #define	CLEARBIT(ADDRESS,BIT) (ADDRESS &= ~(1<<BIT))
 #define	CHECKBIT(ADDRESS,BIT) (ADDRESS & (1<<BIT))
@@ -26,6 +24,7 @@
 #include "Usartlib.h"
 #include "super_paketet.h"
 #include "motor.h"
+#include "sleepMode.h"
 
 #include "util/delay.h"
 
@@ -57,6 +56,13 @@ void disable_transmit()
 
 uint8_t irSensor(uint16_t adc)
 {
+	if(adc < 115) {
+		return 99;
+	}
+	else if(adc > 857) {
+		return 0;	
+	}
+	
 	//translate into voltage
 	double volt = 0.0035*adc;
 	//converts to cm
@@ -66,7 +72,6 @@ uint8_t irSensor(uint16_t adc)
 }
 
 uint16_t adc_read(uint8_t adcx) {
-
 	//sets ADMUX to the pin that will be read
 	ADMUX	&=	0xf0;
 	ADMUX	|=	adcx;
@@ -77,7 +82,13 @@ uint16_t adc_read(uint8_t adcx) {
 
 	//Waiting loop for conversion
 	while ( (ADCSRA & _BV(ADSC)) );
-	return ADC;
+	return ADCW;
+	/*
+		ADCSRA |= (1<<ADSC);                //Start new conversion
+		while(ADCSRA & (1<<ADSC));          //Wait until the conversion is done
+		ADCSRA |= (1<<ADSC);                //Start new conversion
+		while(ADCSRA & (1<<ADSC));          //Wait until the conversion is done
+		*/
 }
 void funkar(void)
 {
@@ -89,8 +100,21 @@ int main()
 	DDRB = 0xff;				// input
 	SETBIT(PORTB,PB0);			// enable pull-up
 	SETBIT(PORTB,PB1);			// enable pull-up
-	ADCSRA |= _BV(ADEN);		//Enable adc	
-	//Set up motor pwm
+	//ADCSRA |= _BV(ADEN);		//Enable adc	
+	
+	//Init ADC:
+	ADCSRA |= (1 << ADPS2) | (1 << ADPS1);  	// ADC prescaler to 128 (gives 125kHz with 8MHz cpu).
+	ADMUX |= (1 << REFS0); 						// Use AVCC as reference.
+		
+	ADCSRA |= (1 << ADEN); 						// Enable ADC
+	ADCSRA |= (1 << ADSC);  					// Start conversion
+	
+	// Enable IR sensor
+	uint8_t irEnabled = 1;
+	DDRB|= (1 << 6);
+	PORTB |= (1 << 6);
+	uint8_t obstacleDistance = 255;
+
 	Motor leftMotor;
 	Motor rightMotor;
 	//left OCA & PD7
@@ -98,6 +122,7 @@ int main()
 	//right OCB & PB7
 	motor_init(&rightMotor, 10, &OCR0B, &DDRB, &PORTB, 7);
 
+	//Set up motor pwm
 	motor_pwm_init(); 
 	
 	//Set up superpaketet
@@ -105,10 +130,13 @@ int main()
 	
 	//We are listening here
 	disable_transmit();
-	
 
 	sei();
 	InitUART(9600);	
+	
+	//Enable status led (shows if in sleep mode or not)
+	DDRD |= (1 << 2);
+	PORTD |= (1 << 2);
 	
 	fdev_setup_stream(&mystdout, uart_putchar, NULL, _FDEV_SETUP_WRITE);
 	stdout = &mystdout;			
@@ -119,28 +147,37 @@ int main()
 	int thLeft = 127,  thRight = 127;
 	
 	static float th_scale = 1;
+
 	
 	while(1)
 	{
 				
  		_delay_ms(3);
+		obstacleDistance = irSensor(adc_read(ADC_PIN));
+		
 		super_paketet inc = check_for_package();
 		if (inc.adress != 0)
 		{
 			//Check if package want a response
-			if ((inc.type & 0x0f) == 7)
+			if ((inc.type & 0x0f) == 7 && irEnabled)
 			{
 				//Send response
 				enable_transmit();
 				inc.type = 7;
 				//Fill data
-				//put distance from irSensor into inc.payload here
+								
+				/*
 				static uint8_t count = 0;
-				inc.payload[0] = count++;//irSensor(adc_read(ADC_PIN));
+				inc.payload[0] = count++;
 				if (count == 99)
 				{
 					count = 0;
 				}
+				*/
+				
+				// Put distance from irSensor into inc.payload here
+				inc.payload[0] = obstacleDistance;
+
 				//_delay_ms();
 				send_package(inc);
 				//wait for send
@@ -153,6 +190,7 @@ int main()
 			}
 			switch(inc.type)
 			{
+				// Speed/direction 
 				case 1:
 					thLeft = inc.payload[0];
 					thRight = inc.payload[1];
@@ -161,33 +199,56 @@ int main()
 				case 2:		//Throttle scaling
 					th_scale = *(uint16_t*)inc.payload / 10000.0;
 					printf("Paket! %d & %d\n\r", inc.payload[0], inc.payload[1]);
-					break;
+					break;		
 				default:
 					//send_string(".", 1);
 					break;
 			}
 		}
 		
-		
-		if(thLeft < 127) {
-			motor_set_direction(&leftMotor, 0);
-			motor_set_throttle(&leftMotor, 127 - thLeft, th_scale);
-		}
-		else 
-		{
-			motor_set_direction(&leftMotor, 1);
-			motor_set_throttle(&leftMotor, thLeft - 127, th_scale);
-		}
-		
-		if(thRight < 127) {
-			motor_set_direction(&rightMotor, 0);
-			motor_set_throttle(&rightMotor, 127 - thRight, th_scale);
+		// If standing still, disable IR sensor
+		if(thRight == 127 && thLeft == 127 && obstacleDistance > 25) {
+			irEnabled = 0;
+			PORTB &= ~(1 << 6);
+			power_adc_disable();
 		}
 		else {
+			irEnabled = 1;
+			PORTB |= (1 << 6); // Enable IR sensor	
+			power_adc_enable();
+		}
+
+
+		
+		if(obstacleDistance < 20) {
 			motor_set_direction(&rightMotor, 1);
-			motor_set_throttle(&rightMotor, thRight - 127, th_scale);
+			motor_set_throttle(&rightMotor, 127, th_scale);
+			motor_set_direction(&leftMotor, 1);
+			motor_set_throttle(&leftMotor, 127, th_scale);
+		}
+		else {
+			if(thLeft < 127) {
+				motor_set_direction(&leftMotor, 0);
+				motor_set_throttle(&leftMotor, 127 - thLeft, th_scale);
+			}
+			else {
+				motor_set_direction(&leftMotor, 1);
+				motor_set_throttle(&leftMotor, thLeft - 127, th_scale);
+			}
+			
+			if(thRight < 127) {
+				motor_set_direction(&rightMotor, 0);
+				motor_set_throttle(&rightMotor, 127 - thRight, th_scale);
+			}
+			else{
+				motor_set_direction(&rightMotor, 1);
+				motor_set_throttle(&rightMotor, thRight - 127, th_scale);
+			}
 		}
 		
+		
+		// Go to idle mode to save some power
+		putToSleep();
 	}
 	funkar();
 }

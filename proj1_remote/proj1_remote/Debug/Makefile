@@ -2,7 +2,7 @@
 # Automatically-generated file. Do not edit!
 ################################################################################
 
-
+SHELL := cmd.exe
 RM := rm -rf
 
 USER_OBJS :=
@@ -40,6 +40,7 @@ C_SRCS +=  \
 ../joystick.c \
 ../proj1_remote.c \
 ../SevenSeg.c \
+../sleepMode.c \
 ../super_paketet.c \
 ../Usartlib.c
 
@@ -54,6 +55,7 @@ OBJS +=  \
 joystick.o \
 proj1_remote.o \
 SevenSeg.o \
+sleepMode.o \
 super_paketet.o \
 Usartlib.o
 
@@ -61,6 +63,7 @@ OBJS_AS_ARGS +=  \
 joystick.o \
 proj1_remote.o \
 SevenSeg.o \
+sleepMode.o \
 super_paketet.o \
 Usartlib.o
 
@@ -68,6 +71,7 @@ C_DEPS +=  \
 joystick.d \
 proj1_remote.d \
 SevenSeg.d \
+sleepMode.d \
 super_paketet.d \
 Usartlib.d
 
@@ -75,6 +79,7 @@ C_DEPS_AS_ARGS +=  \
 joystick.d \
 proj1_remote.d \
 SevenSeg.d \
+sleepMode.d \
 super_paketet.d \
 Usartlib.d
 
@@ -92,6 +97,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

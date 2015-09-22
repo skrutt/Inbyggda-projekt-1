@@ -65,6 +65,7 @@ uint8_t do_crc(uint8_t in_data[], uint8_t length)
 }
 
 uint8_t scramblePackage(super_paketet *package) {
+	/*
 	uint8_t *b;
 	b = (uint8_t *)&package;
 	
@@ -77,9 +78,11 @@ uint8_t scramblePackage(super_paketet *package) {
 			package->type |= (1 << 7);
 		}
 	}
+	*/
 }
 
 uint8_t descramblePackage(super_paketet *package) {
+	/*
 	uint8_t *b;
 	b = (uint8_t *)&package;	
 	
@@ -90,6 +93,7 @@ uint8_t descramblePackage(super_paketet *package) {
 	}
 	
 	package->type &= ~(1 << 7);
+	*/
 }
 
 uint8_t countTransitions (uint8_t b) {

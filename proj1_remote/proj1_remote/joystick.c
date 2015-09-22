@@ -5,6 +5,7 @@ void joystick_init(Joystick *js, uint8_t deadzone_left, uint8_t deadzone_right, 
 	js->deadzone_right = deadzone_right;
 	js->middle_left = middle_left;
 	js->middle_right = middle_right;
+	js->idle = 0;
 
 	//----------- Config ADC -------------
 	ADCSRA |= (1 << ADPS2) | (1 << ADPS1);  	// ADC prescaler to 128 (gives 125kHz with 8MHz cpu).

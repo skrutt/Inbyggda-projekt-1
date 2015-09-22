@@ -39,6 +39,7 @@ SUBDIRS :=
 C_SRCS +=  \
 ../motor.c \
 ../robot_firmware.c \
+../sleepMode.c \
 ../super_paketet.c \
 ../Usartlib.c
 
@@ -52,24 +53,28 @@ ASM_SRCS +=
 OBJS +=  \
 motor.o \
 robot_firmware.o \
+sleepMode.o \
 super_paketet.o \
 Usartlib.o
 
 OBJS_AS_ARGS +=  \
 motor.o \
 robot_firmware.o \
+sleepMode.o \
 super_paketet.o \
 Usartlib.o
 
 C_DEPS +=  \
 motor.d \
 robot_firmware.d \
+sleepMode.d \
 super_paketet.d \
 Usartlib.d
 
 C_DEPS_AS_ARGS +=  \
 motor.d \
 robot_firmware.d \
+sleepMode.d \
 super_paketet.d \
 Usartlib.d
 
@@ -87,6 +92,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 
