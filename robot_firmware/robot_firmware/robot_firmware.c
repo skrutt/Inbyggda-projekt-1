@@ -164,16 +164,6 @@ int main()
 				//Send response
 				enable_transmit();
 				inc.type = 7;
-				//Fill data
-								
-				/*
-				static uint8_t count = 0;
-				inc.payload[0] = count++;
-				if (count == 99)
-				{
-					count = 0;
-				}
-				*/
 				
 				// Put distance from irSensor into inc.payload here
 				inc.payload[0] = obstacleDistance;

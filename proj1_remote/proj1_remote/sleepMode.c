@@ -9,6 +9,7 @@ ISR(TIMER1_OVF_vect) {
 // Wakeup interrupt called when INT0 goes low
 ISR (INT1_vect)
 {
+	PORTB |= (1 << 7);	//Turn on radio again
 }
 
 void startSleepTimer() {
@@ -30,6 +31,7 @@ void initWakeupISR() {
 
 void putToSleep() {
 	PORTC &= ~(1 << 2) &  ~(1 << 3);	//Turn off 7seg
+	PORTB &= ~(1 << 7);					//Put radio to standby
 	
 	set_sleep_mode(SLEEP_MODE_PWR_DOWN);
 	sleep_enable();

@@ -64,6 +64,63 @@ uint8_t do_crc(uint8_t in_data[], uint8_t length)
 	return ret;
 }
 
+/*
+void scramblePackage(super_paketet *package) {
+	
+	uint8_t *b;
+	b = (uint8_t *)package;
+	
+	uint8_t i = 2;
+	uint8_t j = 7;
+	while(i < 5) {
+		if(countTransitions(*(b+i)) < 4) {
+			*(b+i) = 0b10101010 ^ *(b+i);
+			package->type |= (1 << j);
+		}
+		i++;
+		j--;
+	}
+
+}
+
+void descramblePackage(super_paketet *package) {
+	
+	uint8_t *b;
+	b = (uint8_t *)package;
+	
+	uint8_t j = 7;
+	for(uint8_t i = 2; i < 5; i++) {
+		
+		if(*(b+i) & ( 1 << j)) {
+			*(b+i) = 0b10101010 ^ *(b+i);
+		}
+		
+		j--;
+	}
+	
+	package->type &= 0b00001111;
+	
+}
+
+uint8_t countTransitions (uint8_t b) {
+	uint8_t mask, count;
+	uint8_t bCopy, xorResult;
+	
+	bCopy = b;
+	bCopy <<= 1;
+	
+	xorResult = b ^ bCopy;
+
+	for (count = 0, mask = 0x80; mask != 0; mask >>= 1)
+	{
+		if (xorResult & mask)
+		count++;
+	}
+	
+	return (count);
+}
+*/
+
 //Call from isr
 super_paketet process_data_for_package(char incomming_byte)
 {
@@ -80,9 +137,9 @@ super_paketet process_data_for_package(char incomming_byte)
 	*package = *new_package;
 	//check for package
 	
-	
 	if (package->adress == ADRESS)
 	{
+		//descramblePackage(package);
 		//Woo paket!
 		//Crc osv
 		if (package->crc == do_crc((uint8_t*)package, PACKAGE_SIZE - 1))
@@ -121,6 +178,11 @@ super_paketet check_for_package()
 void send_package(super_paketet outgoing_package)
 {
 	outgoing_package.crc = do_crc((uint8_t*)&outgoing_package, PACKAGE_SIZE-1);
+	
+	//Bit scrambling
+	//scramblePackage(&outgoing_package);
+	
+	
 	const int outgoing_data_length = sizeof(super_paketet) + 2;
 	
 	char outgoing_data[outgoing_data_length]; // package + preamble
@@ -145,6 +207,7 @@ int8_t send_request_package(super_paketet *outgoing_package, int timeout)
 	
 	//Wait for buffer to be empty
 	flush_usart();
+	_delay_ms(2);
 	
 	//Toggle transmit pin to listen
 	set_link_mode_receive();
@@ -154,16 +217,19 @@ int8_t send_request_package(super_paketet *outgoing_package, int timeout)
 	{
 		//Check if we have got a package
 		internal_package = check_for_package();
+
 		//is it what we want?
 		if (internal_package.adress != 0 && internal_package.type == outgoing_package->type)
 		{
 			//Woo package!
 			*outgoing_package = internal_package;
+			//Toggle pin back
+			set_link_mode_transmit();
 			//Return success
 			return 0;
 			
 		}
-		_delay_ms(1);
+		_delay_ms(1);		
 	}
 	
 	//Toggle pin back

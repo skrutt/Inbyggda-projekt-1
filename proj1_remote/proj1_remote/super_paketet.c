@@ -64,36 +64,42 @@ uint8_t do_crc(uint8_t in_data[], uint8_t length)
 	return ret;
 }
 
-uint8_t scramblePackage(super_paketet *package) {
-	/*
-	uint8_t *b;
-	b = (uint8_t *)&package;
+/*
+void scramblePackage(super_paketet *package) {
 	
-	uint8_t i;
-	for(i = 0; i < 5; i++) {
-		if(i == 1) i++; //Skip type byte
-		
+	uint8_t *b;
+	b = (uint8_t *)package;
+	
+	uint8_t i = 2;
+	uint8_t j = 7;
+	while(i < 5) {
 		if(countTransitions(*(b+i)) < 4) {
 			*(b+i) = 0b10101010 ^ *(b+i);
-			package->type |= (1 << 7);
+			package->type |= (1 << j);
 		}
+		i++;
+		j--;
 	}
-	*/
+
 }
 
-uint8_t descramblePackage(super_paketet *package) {
-	/*
-	uint8_t *b;
-	b = (uint8_t *)&package;	
+void descramblePackage(super_paketet *package) {
 	
-	for(i = 0; i < 5; i++) {
-		if(i == 1) i++; //Skip type byte
+	uint8_t *b;
+	b = (uint8_t *)package;
+	
+	uint8_t j = 7;
+	for(uint8_t i = 2; i < 5; i++) {
 		
-		*(b+i) = 0b10101010 ^ *(b+i);
+		if(*(b+i) & ( 1 << j)) {
+			*(b+i) = 0b10101010 ^ *(b+i);
+		}
+		
+		j--;
 	}
 	
-	package->type &= ~(1 << 7);
-	*/
+	package->type &= 0b00001111;
+	
 }
 
 uint8_t countTransitions (uint8_t b) {
@@ -113,6 +119,7 @@ uint8_t countTransitions (uint8_t b) {
 	
 	return (count);
 }
+*/
 
 //Call from isr
 super_paketet process_data_for_package(char incomming_byte)
@@ -130,10 +137,11 @@ super_paketet process_data_for_package(char incomming_byte)
 	*package = *new_package;
 	//check for package
 	
-	// Check if the package is scrambled.
+	/*
 	if(package->type & (1 << 7)) {
-		descramblePackage(&package);
-	}
+		descramblePackage(package);
+	}*/
+	
 	
 	if (package->adress == ADRESS)
 	{
@@ -177,7 +185,7 @@ void send_package(super_paketet outgoing_package)
 	outgoing_package.crc = do_crc((uint8_t*)&outgoing_package, PACKAGE_SIZE-1);
 	
 	//Bit scrambling
-	scramblePackage(&outgoing_package);
+	//scramblePackage(&outgoing_package);	
 	
 	const int outgoing_data_length = sizeof(super_paketet) + 2;
 	

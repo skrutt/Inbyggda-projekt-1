@@ -61,15 +61,15 @@ float readBatteryVoltage() {
 	uint8_t adcVal = 0;
 	float voltage;
 		
-	ADMUX |= (1 << REFS0) | (1 << REFS1);	//Use 1.1V internal reference
+	ADMUX |= (1 << REFS0) | (1 << REFS1);	// Use 1.1V internal reference
 	_delay_ms(10);
 		
-	ADMUX &= 0xF0;						//Clear the old channel
+	ADMUX &= 0xF0;						// Clear the old channel
 	ADMUX |= 5;
-	ADCSRA |= (1<<ADSC);                //Start new conversion
-	while(ADCSRA & (1<<ADSC));          //Wait until the conversion is done
-	ADCSRA |= (1<<ADSC);                //Start new conversion
-	while(ADCSRA & (1<<ADSC));          //Wait until the conversion is done
+	ADCSRA |= (1<<ADSC);                // Start new conversion
+	while(ADCSRA & (1<<ADSC));          // Wait until the conversion is done
+	ADCSRA |= (1<<ADSC);                // Start new conversion
+	while(ADCSRA & (1<<ADSC));          // Wait until the conversion is done
 		
 	adcVal = (ADCW>>2);		
 		
@@ -78,23 +78,27 @@ float readBatteryVoltage() {
 	ADMUX &= ~(1 << REFS1); 			// Use AVCC as reference.
 	_delay_ms(10);
 		
-	return voltage;
-		
-		
+	return voltage;	
 }
 
 //FLYTTA TILL EGEN FIL:
 ISR(TIMER0_OVF_vect) {
 	batteryCounter++;
 	if(batteryCounter > 200) {		//2000 = ungefär en minut
+		
+		PORTD |= (1 << 7);	//Enable power to voltage divider
+		_delay_ms(2);
+		
 		float voltage = readBatteryVoltage();
-		if(voltage < 3.3) {
+		if(voltage < 4) {
 			PORTD |= (1 << 2);
 		}
 		else {
 			PORTD &= ~(1 << 2);
 		}
 		batteryCounter = 0;
+		
+		PORTD &= ~(1 << 7);	//Disable power to voltage divider
 	}
 }
 
@@ -106,14 +110,13 @@ void initBatteryCheckTimer() {
 
 static FILE mystdout = FDEV_SETUP_STREAM(usart_putchar_printf, NULL, _FDEV_SETUP_WRITE);	//DEBUG ONLY
 
-
 int main(void)
 {	
 	stdout = &mystdout;		//DEBUG ONLY
 	
 	/*---------- Init Joysticks ----------*/
 	Joystick js;
-	joystick_init(&js, 6, 6, 145, 150);
+	joystick_init(&js, 3, 3, 122, 127);
 	
 	/*---------- Init UART and superpaketet ----------*/
 	InitUART(9600);	
@@ -143,7 +146,22 @@ int main(void)
 	// Manual sleep button
 	DDRD &= ~(0 << 6);
 	PORTD |= (1 << 6);
-
+	
+	//Radio enable pin
+	DDRB |= (1 << 7);
+	PORTB |= (1 << 7);
+	
+	//Power measure circuit vcc
+	DDRD |= (1 << 7);
+	PORTD &= ~(1 << 7);
+	
+	/*
+	while(1) {
+		printf("jsLeft : %d, jsRight: %d\n", joystick_get_throttle(&js, JOYSTICK_LEFT_CHANNEL), joystick_get_throttle(&js, JOYSTICK_RIGHT_CHANNEL));
+		
+		_delay_ms(5000);
+	}
+	*/
 
 	while(1)
     {		

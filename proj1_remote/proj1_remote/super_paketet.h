@@ -36,4 +36,9 @@ int8_t send_request_package(super_paketet *outgoing_package, int timeout);
 void set_link_mode_functions(void (*enable_transmit), void (*disable_transmit));
 
 
+void scramblePackage(super_paketet*);
+void descramblePackage(super_paketet*);
+uint8_t countTransitions (uint8_t);
+
+
 #endif /* SUPER_PAKETET_H_ */

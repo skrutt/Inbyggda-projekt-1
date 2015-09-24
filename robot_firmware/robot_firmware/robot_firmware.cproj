@@ -124,6 +124,9 @@
     <Compile Include="super_paketet.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="super_paketet.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="Usartlib.c">
       <SubType>compile</SubType>
     </Compile>

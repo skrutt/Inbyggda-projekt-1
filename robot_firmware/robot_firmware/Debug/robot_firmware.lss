@@ -13,19 +13,19 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
   4 .debug_aranges 00000160  00000000  00000000  000017ae  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   0000146c  00000000  00000000  0000190e  2**0
+  5 .debug_info   000014b0  00000000  00000000  0000190e  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 000008b5  00000000  00000000  00002d7a  2**0
+  6 .debug_abbrev 000008d9  00000000  00000000  00002dbe  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   000007d1  00000000  00000000  0000362f  2**0
+  7 .debug_line   000007eb  00000000  00000000  00003697  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000384  00000000  00000000  00003e00  2**2
+  8 .debug_frame  00000384  00000000  00000000  00003e84  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    00000603  00000000  00000000  00004184  2**0
+  9 .debug_str    000005c2  00000000  00000000  00004208  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    00000f80  00000000  00000000  00004787  2**0
+ 10 .debug_loc    00001083  00000000  00000000  000047ca  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 00000140  00000000  00000000  00005707  2**0
+ 11 .debug_ranges 00000158  00000000  00000000  0000584d  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -1324,6 +1324,8 @@ uint8_t do_crc(uint8_t in_data[], uint8_t length)
      70c:	08 95       	ret
 
 0000070e <process_data_for_package>:
+}
+*/
 
 //Call from isr
 super_paketet process_data_for_package(char incomming_byte)
@@ -1359,12 +1361,12 @@ super_paketet process_data_for_package(char incomming_byte)
      734:	e1 f7       	brne	.-8      	; 0x72e <process_data_for_package+0x20>
 	//check for package
 	
-	
 	if (package->adress == ADRESS)
      736:	80 91 20 01 	lds	r24, 0x0120
      73a:	86 36       	cpi	r24, 0x66	; 102
      73c:	89 f4       	brne	.+34     	; 0x760 <process_data_for_package+0x52>
 	{
+		//descramblePackage(package);
 		//Woo paket!
 		//Crc osv
 		if (package->crc == do_crc((uint8_t*)package, PACKAGE_SIZE - 1))
@@ -1520,6 +1522,7 @@ void send_package(super_paketet outgoing_package)
      814:	08 96       	adiw	r24, 0x08	; 8
      816:	0e 94 74 03 	call	0x6e8	; 0x6e8 <do_crc>
      81a:	8c 87       	std	Y+12, r24	; 0x0c
+	
 	const int outgoing_data_length = sizeof(super_paketet) + 2;
 	
 	char outgoing_data[outgoing_data_length]; // package + preamble
