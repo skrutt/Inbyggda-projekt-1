@@ -13,7 +13,6 @@
 void InitUART( unsigned int);
 
 typedef struct __attribute__((packed)) {
-	//uint16_t preamble;
 	uint8_t adress;
 	uint8_t type;
 	uint8_t payload[2];

@@ -71,7 +71,6 @@ ISR(USART_RX_vect)
 /* Read and write functions */
 char ReceiveByte(char * result)
 {
-	//get_lock();
 	//If we have data
 	if (incomming_data_counter > 0)
 	{
@@ -89,7 +88,6 @@ char ReceiveByte(char * result)
 
 		//return that data
 		*result = *temp;
-//		release_lock();
 		
 		return 1;
 	} 

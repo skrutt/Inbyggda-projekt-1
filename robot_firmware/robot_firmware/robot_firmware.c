@@ -28,7 +28,6 @@
 
 #include "util/delay.h"
 
-
 FILE mystdout;
 
 int uart_putchar(char c, FILE *stream) 
@@ -47,6 +46,7 @@ void enable_transmit()
 	TRANSMIT_PORT_DDR |= TRANSMIT_PIN;
 	TRANSMIT_PORT	|= TRANSMIT_PIN;
 }
+
 //Set transmit low
 void disable_transmit()
 {
@@ -54,6 +54,7 @@ void disable_transmit()
 	TRANSMIT_PORT	&= ~TRANSMIT_PIN;
 }
 
+// Convert adc reading to distance in centimeters
 uint8_t irSensor(uint16_t adc)
 {
 	if(adc < 115) {
@@ -71,6 +72,7 @@ uint8_t irSensor(uint16_t adc)
 	return cm;
 }
 
+// Read ADC to get IR-sensor value
 uint16_t adc_read(uint8_t adcx) {
 	//sets ADMUX to the pin that will be read
 	ADMUX	&=	0xf0;
@@ -83,24 +85,14 @@ uint16_t adc_read(uint8_t adcx) {
 	//Waiting loop for conversion
 	while ( (ADCSRA & _BV(ADSC)) );
 	return ADCW;
-	/*
-		ADCSRA |= (1<<ADSC);                //Start new conversion
-		while(ADCSRA & (1<<ADSC));          //Wait until the conversion is done
-		ADCSRA |= (1<<ADSC);                //Start new conversion
-		while(ADCSRA & (1<<ADSC));          //Wait until the conversion is done
-		*/
 }
-void funkar(void)
-{
-	return;
-}
+
 int main()
 {
 	DDRD = 2;					// output
 	DDRB = 0xff;				// input
 	SETBIT(PORTB,PB0);			// enable pull-up
 	SETBIT(PORTB,PB1);			// enable pull-up
-	//ADCSRA |= _BV(ADEN);		//Enable adc	
 	
 	//Init ADC:
 	ADCSRA |= (1 << ADPS2) | (1 << ADPS1);  	// ADC prescaler to 128 (gives 125kHz with 8MHz cpu).
@@ -111,7 +103,7 @@ int main()
 	
 	// Enable IR sensor
 	uint8_t irEnabled = 1;
-	DDRB|= (1 << 6);
+	DDRB |= (1 << 6);
 	PORTB |= (1 << 6);
 	uint8_t obstacleDistance = 255;
 
@@ -138,20 +130,13 @@ int main()
 	DDRD |= (1 << 2);
 	PORTD |= (1 << 2);
 	
-	fdev_setup_stream(&mystdout, uart_putchar, NULL, _FDEV_SETUP_WRITE);
-	stdout = &mystdout;			
-	_delay_ms(5);
-	
-	send_string(" Wait", 5);
-	
-	int thLeft = 127,  thRight = 127;
+	uint8_t thLeft = 127,  thRight = 127;
 	
 	static float th_scale = 1;
 
 	
 	while(1)
-	{
-				
+	{			
  		_delay_ms(3);
 		obstacleDistance = irSensor(adc_read(ADC_PIN));
 		
@@ -167,15 +152,12 @@ int main()
 				
 				// Put distance from irSensor into inc.payload here
 				inc.payload[0] = obstacleDistance;
-
-				//_delay_ms();
+				
 				send_package(inc);
 				//wait for send
 				flush_usart();
 				_delay_ms(1);
-				
 
-				//_delay_ms(10);
 				disable_transmit();
 			}
 			switch(inc.type)
@@ -184,14 +166,12 @@ int main()
 				case 1:
 					thLeft = inc.payload[0];
 					thRight = inc.payload[1];
-					//printf("Paket! %d & %d\n\r", inc.payload[0], inc.payload[1]);
 					break;
 				case 2:		//Throttle scaling
 					th_scale = *(uint16_t*)inc.payload / 10000.0;
 					printf("Paket! %d & %d\n\r", inc.payload[0], inc.payload[1]);
 					break;		
 				default:
-					//send_string(".", 1);
 					break;
 			}
 		}
@@ -204,7 +184,7 @@ int main()
 		}
 		else {
 			irEnabled = 1;
-			PORTB |= (1 << 6); // Enable IR sensor	
+			PORTB |= (1 << 6);	// Enable IR sensor	
 			power_adc_enable();
 		}
 
@@ -240,5 +220,4 @@ int main()
 		// Go to idle mode to save some power
 		putToSleep();
 	}
-	funkar();
 }

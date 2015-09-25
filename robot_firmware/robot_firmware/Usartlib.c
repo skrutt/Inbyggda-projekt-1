@@ -11,7 +11,7 @@
 #include "avr/interrupt.h"
 //#include "Usartlib.h"
 
-//Stuff for usart system
+//TX and RX buffer initializatoin
 #define USART_TX_BUFFER_SIZE 100
 volatile char		outgoing_data[USART_TX_BUFFER_SIZE];
 volatile uint8_t	outgoing_data_counter = 0;
@@ -45,6 +45,7 @@ ISR(USART_UDRE_vect)
 		
 	}
 }
+
 //Usart receive interrupt
 ISR(USART_RX_vect)
 {

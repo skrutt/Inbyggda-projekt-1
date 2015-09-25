@@ -137,14 +137,9 @@ super_paketet process_data_for_package(char incomming_byte)
 	*package = *new_package;
 	//check for package
 	
-	/*
-	if(package->type & (1 << 7)) {
-		descramblePackage(package);
-	}*/
-	
-	
 	if (package->adress == ADRESS)
 	{
+		//descramblePackage(package);
 		//Woo paket!
 		//Crc osv
 		if (package->crc == do_crc((uint8_t*)package, PACKAGE_SIZE - 1))
@@ -185,7 +180,8 @@ void send_package(super_paketet outgoing_package)
 	outgoing_package.crc = do_crc((uint8_t*)&outgoing_package, PACKAGE_SIZE-1);
 	
 	//Bit scrambling
-	//scramblePackage(&outgoing_package);	
+	//scramblePackage(&outgoing_package);
+	
 	
 	const int outgoing_data_length = sizeof(super_paketet) + 2;
 	

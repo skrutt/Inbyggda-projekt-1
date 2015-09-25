@@ -37,6 +37,7 @@ SUBDIRS :=
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
+../battery.c \
 ../joystick.c \
 ../proj1_remote.c \
 ../SevenSeg.c \
@@ -52,6 +53,7 @@ ASM_SRCS +=
 
 
 OBJS +=  \
+battery.o \
 joystick.o \
 proj1_remote.o \
 SevenSeg.o \
@@ -60,6 +62,7 @@ super_paketet.o \
 Usartlib.o
 
 OBJS_AS_ARGS +=  \
+battery.o \
 joystick.o \
 proj1_remote.o \
 SevenSeg.o \
@@ -68,6 +71,7 @@ super_paketet.o \
 Usartlib.o
 
 C_DEPS +=  \
+battery.d \
 joystick.d \
 proj1_remote.d \
 SevenSeg.d \
@@ -76,6 +80,7 @@ super_paketet.d \
 Usartlib.d
 
 C_DEPS_AS_ARGS +=  \
+battery.d \
 joystick.d \
 proj1_remote.d \
 SevenSeg.d \
@@ -97,6 +102,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

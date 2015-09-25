@@ -6,21 +6,19 @@
 
 #include <avr/io.h>
 
-	typedef struct Joystick {
-		uint8_t left;
-		uint8_t right;	
-		uint8_t deadzone_left;
-		uint8_t deadzone_right;
-		uint8_t middle_left;				//128 = middle of default range
-		uint8_t middle_right;
-		uint8_t idle;
-	} Joystick;
+typedef struct Joystick {
+	uint8_t left;				// Left joystick throttle
+	uint8_t right;				// Right joystick throttle
+	uint8_t deadzone_left;		// Deadzone for left joystick
+	uint8_t deadzone_right;		// Deadzone for right joystick
+	uint8_t middle_left;		// Center value for left joystick
+	uint8_t middle_right;		// Center value for right joystick
+	uint8_t idle;				// Set to one if the joystick is at center position
+} Joystick;			
 	
-	void joystick_init(Joystick*, uint8_t, uint8_t, uint8_t, uint8_t);
+void joystick_init(Joystick*, uint8_t, uint8_t, uint8_t, uint8_t);
 	
-	void joystick_update(Joystick*);
-	
-	uint8_t joystick_get_throttle(Joystick*, uint8_t);
-	uint8_t joystick_get_throttle_dir_combined(Joystick*, unsigned char);
+uint8_t joystick_get_throttle(Joystick*, uint8_t);
+uint8_t joystick_get_throttle_dir_combined(Joystick*, unsigned char);
 	
 #endif

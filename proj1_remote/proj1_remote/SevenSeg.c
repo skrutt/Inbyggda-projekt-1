@@ -34,7 +34,6 @@ ISR(TIMER2_OVF_vect)
 	{
 		SETBIT(PORTC, 2);
 		CLEARBIT(PORTC, 3);	
-		//PORTC = PORTC ~& 0xF;
 		PORTB = SevenSeg[sevenTen];
 		whichSeg = 1;
 	}
@@ -43,7 +42,6 @@ ISR(TIMER2_OVF_vect)
 	{
 		SETBIT(PORTC, 3);
 		CLEARBIT(PORTC, 2);
-		//PORTC = 0x08;
 		PORTB = SevenSeg[sevenOne];
 		whichSeg = 0;
 	}

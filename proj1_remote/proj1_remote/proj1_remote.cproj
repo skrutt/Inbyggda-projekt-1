@@ -113,6 +113,12 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="battery.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="battery.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="joystick.c">
       <SubType>compile</SubType>
     </Compile>

@@ -17,13 +17,12 @@
 #include "super_paketet.h"
 #include "SevenSeg.h"
 #include "sleepMode.h"
+#include "battery.h"
 
 /* --------- Transmit mode --------- */
 #define TRANSMIT_PIN		1 << 4
 #define TRANSMIT_PORT		PORTC
 #define TRANSMIT_PORT_DDR	DDRC
-
-uint16_t batteryCounter = 0;
 
 //Set transmit high
 void enable_transmit()
@@ -38,82 +37,8 @@ void disable_transmit()
 	TRANSMIT_PORT	&= ~TRANSMIT_PIN;
 }
 
-/* ------------------------------- */
-
-//DEBUG ONLY:
-void usart_putchar(char data)
-{
-	// Stay here until data buffer is empty
-	while (!(UCSR0A & _BV(UDRE0)));
-	UDR0 = data;
-	
-}
-
-//DEBUG ONLY:
-int usart_putchar_printf(char var, FILE *stream) {
-	if (var == '\n') usart_putchar('\r');
-	usart_putchar(var);
-	return 0;
-}
-
-float readBatteryVoltage() {
-	
-	uint8_t adcVal = 0;
-	float voltage;
-		
-	ADMUX |= (1 << REFS0) | (1 << REFS1);	// Use 1.1V internal reference
-	_delay_ms(10);
-		
-	ADMUX &= 0xF0;						// Clear the old channel
-	ADMUX |= 5;
-	ADCSRA |= (1<<ADSC);                // Start new conversion
-	while(ADCSRA & (1<<ADSC));          // Wait until the conversion is done
-	ADCSRA |= (1<<ADSC);                // Start new conversion
-	while(ADCSRA & (1<<ADSC));          // Wait until the conversion is done
-		
-	adcVal = (ADCW>>2);		
-		
-	voltage =  (((float)adcVal/255.0)*1.025) * 5.4;
-		
-	ADMUX &= ~(1 << REFS1); 			// Use AVCC as reference.
-	_delay_ms(10);
-		
-	return voltage;	
-}
-
-//FLYTTA TILL EGEN FIL:
-ISR(TIMER0_OVF_vect) {
-	batteryCounter++;
-	if(batteryCounter > 200) {		//2000 = ungefär en minut
-		
-		PORTD |= (1 << 7);	//Enable power to voltage divider
-		_delay_ms(2);
-		
-		float voltage = readBatteryVoltage();
-		if(voltage < 4) {
-			PORTD |= (1 << 2);
-		}
-		else {
-			PORTD &= ~(1 << 2);
-		}
-		batteryCounter = 0;
-		
-		PORTD &= ~(1 << 7);	//Disable power to voltage divider
-	}
-}
-
-void initBatteryCheckTimer() {
-	TCCR0B = 1 << CS02 | 0 << CS01 | 1 << CS00;		//Prescaler 1024
-	TIMSK0 = (1<<TOIE0);							//Enable Timer 2 overflow flag
-}
-
-
-static FILE mystdout = FDEV_SETUP_STREAM(usart_putchar_printf, NULL, _FDEV_SETUP_WRITE);	//DEBUG ONLY
-
 int main(void)
 {	
-	stdout = &mystdout;		//DEBUG ONLY
-	
 	/*---------- Init Joysticks ----------*/
 	Joystick js;
 	joystick_init(&js, 3, 3, 122, 127);
@@ -154,30 +79,14 @@ int main(void)
 	//Power measure circuit vcc
 	DDRD |= (1 << 7);
 	PORTD &= ~(1 << 7);
-	
-	/*
-	while(1) {
-		printf("jsLeft : %d, jsRight: %d\n", joystick_get_throttle(&js, JOYSTICK_LEFT_CHANNEL), joystick_get_throttle(&js, JOYSTICK_RIGHT_CHANNEL));
-		
-		_delay_ms(5000);
-	}
-	*/
 
 	while(1)
     {		
 		// Check if manual sleep button is pressed, if so go to sleep
-		// Move this to interrupt pin?
 		if(!(PIND & (1<<6))) {
 			package.type = 0x03;
 			send_package(package);
 			_delay_ms(20);
-			send_package(package);
-			_delay_ms(20);
-			send_package(package);
-			_delay_ms(20);
-			send_package(package);
-			_delay_ms(20);
-			send_package(package);
 			putToSleep();
 		}
     	

@@ -6,9 +6,9 @@
 typedef struct Motor {
 	int8_t throttle_offset;		// Used for compensating for individual motor characteristics.
 	volatile uint8_t *OCR;		// Which PWM output compare register/pin to use.
-	uint8_t direction;			// 0 = reverse, 1 = forward
-	volatile uint8_t *dirPort;
-	uint8_t dirPin;
+	uint8_t direction;			// 0 = reverse, 1 = forward.
+	volatile uint8_t *dirPort;	// Defines which port the direction input is connected to.
+	uint8_t dirPin;				// The IO-pin that is used for controlling direction.
 } Motor;
 
 void motor_init(Motor*, uint8_t, volatile uint8_t*, volatile uint8_t*, volatile uint8_t*, uint8_t);
